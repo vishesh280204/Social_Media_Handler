@@ -76,7 +76,7 @@ const Dashboard = () => {
 
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-3xl  font-medium  text-slate-800  tabular-nums">{card.value}</div>
-                  <div className="text-sm  absolute right-4 top-4 text-violet-500 flex items-center
+                  <div className="text-sm  absolute right-4 top-4 text-red-500 flex items-center
               gap-1"><TrendingUpIcon className='size-3' />{card.trend}</div>
                 </div>
 

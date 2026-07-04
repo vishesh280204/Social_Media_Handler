@@ -59,7 +59,7 @@ const Sidebar = ({isOpen,setIsOpen}: {isOpen: boolean, setIsOpen: (val: boolean)
           <div className="p-4 border-t border-slate-100">
             <div className="flex items-center gap-3 p-2 rounded-x1 hover:bg-slate-50
             transition-colors">
-                <div className='size-8  rounded-full bg-linear-to-br from via-violet-400 to bg-pink-300 flex items-center justify-center text-white text-sm font-medium shrink-0'>
+                <div className='size-8  rounded-full bg-linear-to-br from via-red-500 to bg-red-300 flex items-center justify-center text-white text-sm font-medium shrink-0'>
                 {user?.name?.charAt(0).toUpperCase() || "U"}
               </div>
               <div className='flex-1 min-w-0'>
