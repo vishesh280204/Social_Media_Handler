@@ -1,17 +1,22 @@
 import express from "express";
 import cors from "cors"
 import "dotenv/config"
-import connectDB from "./db/db.js";
+import connectDB from "./src/db/db.js";
+import type{ Request,Response } from "express";
 
-connectDB()
+await connectDB()
 const app=express()
 
 app.use(cors())
 app.use(express.json())
 
+app.use((err:any,req:Request,res:Response)=>{
+    console.log(err)
+    res.status(500).send(err?.response?.data?.message || err?.message)
+})
  
 const port = process.env.PORT || 5000
-app.get("/",(req,res)=>{
+app.get("/",(req:Request,res:Response)=>{
     res.send("Hi server is live ")
 })
 app.listen(port, ()=>{
