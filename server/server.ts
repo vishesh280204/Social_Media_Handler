@@ -4,6 +4,7 @@ import "dotenv/config"
 import connectDB from "./src/db/db.js";
 import type{ Request,Response } from "express";
 import { router } from "./src/routes/authRoutes.js";
+import socialAuthRouter from "./src/routes/socialAuthRoutes.js";
 
 await connectDB()
 const app=express()
@@ -11,6 +12,7 @@ const app=express()
 app.use(cors())
 app.use(express.json())
 app.use("/api/auth/",router)
+app.use("/api/oath",socialAuthRouter)
 app.use((err:any,req:Request,res:Response)=>{
     console.log(err)
     res.status(500).send(err?.response?.data?.message || err?.message)
