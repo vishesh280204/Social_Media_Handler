@@ -5,6 +5,10 @@ import connectDB from "./src/db/db.js";
 import type{ Request,Response } from "express";
 import { router } from "./src/routes/authRoutes.js";
 import socialAuthRouter from "./src/routes/socialAuthRoutes.js";
+import { accountRouter } from "./src/routes/accountRoutes.js";
+import { postRouter } from "./src/routes/postRoutes.js";
+import { activtiyRouter } from "./src/routes/activityRoutes.js";
+import { initScheduler } from "./src/services/schedulerService.js";
 
 await connectDB()
 const app=express()
@@ -13,6 +17,14 @@ app.use(cors())
 app.use(express.json())
 app.use("/api/auth/",router)
 app.use("/api/oath",socialAuthRouter)
+app.use("/api/accounts",accountRouter)
+app.use("/api/posts",postRouter)
+app.use("/api/activity",activtiyRouter)
+
+// Initialize the scheduler
+initScheduler()
+
+
 app.use((err:any,req:Request,res:Response)=>{
     console.log(err)
     res.status(500).send(err?.response?.data?.message || err?.message)
