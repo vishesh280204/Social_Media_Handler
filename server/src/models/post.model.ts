@@ -17,11 +17,13 @@ export const postSchema= new Schema({
         type:String,
         enum:['image','video']
     },
-    platforms:{
-        type:String,  
-        enum:["twitter","facebook","linkedin","instagram","facebook_page","linkedin_page","instagram_business"],
-        required:true,
-    },
+    platforms:[
+        {
+            type:String,  
+            enum:["twitter","facebook","linkedin","instagram","facebook_page","linkedin_page","instagram_business"],
+        }
+
+    ],
     scheduledFor:{
         type:Date,
         required:true

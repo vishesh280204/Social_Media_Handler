@@ -40,8 +40,11 @@ export const initScheduler = () => {
                         publishNow:true,
                         ...(post.mediaUrl ? {
                             
-                                mediaItems:[{type: post.mediaType || "image"}]  ,
-                                url:post.mediaUrl
+                                mediaItems:[{
+                                    type: post.mediaType || "image",
+                                    url:post.mediaUrl
+                                }] 
+                                
 
                             }:{}),
                         platforms:zernioPlatforms
@@ -49,6 +52,7 @@ export const initScheduler = () => {
 
                     console.log(`Publish post : ${post._id} to Zernio with media: ${post.mediaUrl || "none"}`)
 
+                    console.log(JSON.stringify(payload, null, 2));
                     //Publishing through zernio
                     const response = await zernio.posts.createPost({
                         body: payload
@@ -73,7 +77,7 @@ export const initScheduler = () => {
                 } catch (error:any) {
                      // failing to publish the post
                        console.log(`Failed to publish the post ${post._id} :`,
-                        error?.response?.data || error?.mesage
+                        error
                        )
                        post.status="failed"
                        await post.save()

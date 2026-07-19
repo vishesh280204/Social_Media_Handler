@@ -12,7 +12,7 @@ const pageTitles:Record<string,string>={
   "/dashboard": "Dashboard" ,
   "/accounts": "Social Accounts" ,
   "/schedule": "Post Scheduler" ,
-  "/au-composer": "AI Composer" ,
+  "/ai-composer": "AI Composer" ,
 }
 
 const Layout = () => {

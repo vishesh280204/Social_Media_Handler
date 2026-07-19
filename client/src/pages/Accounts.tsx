@@ -71,6 +71,7 @@ const Accounts = () => {
       window.location.href=data.url;
     } catch (error:any) {
       toast.error( error?.response?.data?.message ||error?.message ||`Failed to connect ${platformId}`)
+      console.log(error)
       setConnecting(null)
     }
 
