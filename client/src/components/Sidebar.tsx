@@ -1,15 +1,12 @@
 
 import { LayoutDashboardIcon,UsersIcon,CalendarDaysIcon,Wand2Icon, LogOutIcon } from 'lucide-react'
 import { NavLink, useLocation } from 'react-router-dom'
+import { useAuthContext } from '../context/authContext'
 const Sidebar = ({isOpen,setIsOpen}: {isOpen: boolean, setIsOpen: (val: boolean) =>void}) => {
  const location = useLocation()
   
-  const {logout,user}={
-    logout:()=>{
-      window.location.href='/'
-    },
-    user:{ name:"John Doe",email:"johndoe@gmail.com"}
-  }
+  const {logout,user}=useAuthContext()
+
 
   const navItems =[
     {name: "Dashboard", icon: LayoutDashboardIcon, path: "/dashboard"},
@@ -67,7 +64,9 @@ const Sidebar = ({isOpen,setIsOpen}: {isOpen: boolean, setIsOpen: (val: boolean)
                 <div className='text-xs ■text-slate-400 truncate'>{user?.email}</div>
               </div>
             </div>
-            <button className="mt-1 flex items-center gap-2 px-3 py-2 w-full rounded text-sm text-slate-500 |hover:bg-red-50 ☐ hover: text-red-500 transition-all duration-150">
+            <button className="mt-1 flex items-center gap-2 px-3 py-2 w-full rounded text-sm text-slate-500 |hover:bg-red-50 ☐ hover: text-red-500 transition-all duration-150"
+            onClick={logout}
+            >
               <LogOutIcon className='size-4'/>
               Sign Out
             </button>

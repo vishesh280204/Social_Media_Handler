@@ -3,6 +3,6 @@ import { getActivity } from "../controllers/activity.controller.js";
 import { protectAuthMiddleware } from "../middleware/auth.middleware.js";
 
 
-export const activtiyRouter=Router()
+export const activityRouter=Router()
 
-activtiyRouter.get("/",protectAuthMiddleware,getActivity)
+activityRouter.get("/",protectAuthMiddleware,getActivity)

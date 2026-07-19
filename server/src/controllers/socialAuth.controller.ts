@@ -58,6 +58,8 @@ const getOrCreateZernioProfile= async(user:any):Promise<string>=>{
 //GET /api/auth/:platform
 export const generateAuthUrl=async (req:AuthRequest,res:Response) : Promise<void>=>{
     try{
+        console.log("In generateAuthUrl")
+
         const {platform}=req.params!;
         const profileId=await getOrCreateZernioProfile(req.user)
         if (!profileId) {
@@ -67,7 +69,7 @@ export const generateAuthUrl=async (req:AuthRequest,res:Response) : Promise<void
         const origin =req.headers.origin!;
         const redirectUrl=`${origin}/accounts`
         
-        const result= zernio.connect.getConnectUrl({
+        const result= await zernio.connect.getConnectUrl({
             path:{platform:platform as any},
             query:{
                 profileId,
@@ -76,7 +78,8 @@ export const generateAuthUrl=async (req:AuthRequest,res:Response) : Promise<void
         })
 
         const data= result.data as any;
-        console.log("getConnectUrl response",JSON.stringify(DataTransferItem,null,2))
+        // console.log(result)
+        // console.log("getConnectUrl response",JSON.stringify(data,null,2))
 
         const authUrl=data.authUrl
         if(!authUrl){
@@ -93,12 +96,13 @@ export const generateAuthUrl=async (req:AuthRequest,res:Response) : Promise<void
 // Sync connected accounts from Zernio into MongoDB
 // GET /api/auth/sync
 //This is for the accounts of profile like vishesh has twitter account and instagram account
-export const synAccounts= async (req:AuthRequest,res:Response) : Promise<void> =>{
+export const syncAccounts= async (req:AuthRequest,res:Response) : Promise<void> =>{
     try{
+        console.log("In syncAccounts ")
         //collecting connected zaccounts
         const {platform}= req.params!
         const profileId = await getOrCreateZernioProfile(req.user)
-        const result= zernio.accounts.listAccounts({
+        const result= await zernio.accounts.listAccounts({
             query: {profileId} as any
         })
         const data=result.data as any

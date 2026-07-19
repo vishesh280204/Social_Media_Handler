@@ -12,8 +12,10 @@ export const protectAuthMiddleware=async(req:AuthRequest,res: Response,next:Next
     if(req.headers.authorization && req.headers.authorization.startsWith("Bearer")){
         try{
             token = req.headers.authorization.split(" ")[1]
-            const decoded: any = jwt.verify(token, process.env.JWT_SECRET!)
-            req.user=await User.findOne(decoded.id).select("-password")
+            // console.log("Authorization:", req.headers.authorization);
+            // console.log("Token:", token);
+            const decoded: any = jwt.verify(token, process.env.JWT_SECRET_CODE!)
+            req.user=await User.findById(decoded.id).select("-password")
             next()
         }
         catch(err:any){

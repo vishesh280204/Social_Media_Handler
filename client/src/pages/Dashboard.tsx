@@ -1,6 +1,6 @@
 import { ActivityIcon, CheckCircleIcon, ClockIcon, Divide, SendIcon, Share2Icon, TrendingUpIcon } from 'lucide-react'
 import React, { useEffect, useState, } from 'react'
-import { dummyAccountsData, dummyActivityData, dummyPostsData } from '../assets/assets'
+import api from '../api/axios'
 
 const Dashboard = () => {
   const[ activities,setActivities] =useState<any[]>([])
@@ -12,11 +12,11 @@ const Dashboard = () => {
   useEffect(() => {
   const fetchDashboardData = async () => {
     try {
-      const [postsRes, accountsRes, activityRes] = [
-        { data: dummyPostsData },
-        { data: dummyAccountsData },
-        { data: dummyActivityData },
-      ];
+      // const postsRes= await api.get('/api/posts')
+      // const accountsRes= await api.get('/api/accounts')
+      // const activityRes= await 
+      const [postsRes, accountsRes, activityRes] = await Promise.all([api.get('/api/posts'),api.get('/api/accounts'),api.get('/api/activity')])
+      
 
       const posts = postsRes.data;
 
@@ -30,7 +30,7 @@ const Dashboard = () => {
 
       setActivities(activityRes.data);
     } catch (error: any) {
-      console.error("Error fetching dashboard data", error);
+      console.error(error?.response?.data?.message||"Error fetching dashboard data", error?.message);
     }
   };
 

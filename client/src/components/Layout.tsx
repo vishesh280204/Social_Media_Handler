@@ -4,7 +4,8 @@ import Sidebar from './Sidebar'
 import { useState } from 'react'
 import React from 'react'
 
-import { Outlet, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { useAuthContext } from '../context/authContext'
 
 
 const pageTitles:Record<string,string>={
@@ -18,6 +19,24 @@ const Layout = () => {
   const location=useLocation()
   const title=pageTitles[location.pathname] || "SocialAI"
   const [isMobileMenuOpen,setIsMobileMenuOpen]=useState(false)
+
+  const {isAuthenticated,isLoading}=useAuthContext()
+
+  if(isLoading){
+    return (
+      <div>
+        <div>
+         Loading...
+        </div>
+      </div>
+    )
+  }
+  if(!isAuthenticated){
+    return (
+      <Navigate to='/login' replace/>
+    )
+  }
+
   return (
     <div className='flex h-screen bg-slate-50'>
 

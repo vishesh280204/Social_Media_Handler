@@ -5,8 +5,9 @@ import jwt from "jsonwebtoken"
 import "dotenv/config"
 import bcrypt from "bcrypt"
 
-const generateToken=async function(id:string){
-    return  jwt.sign({id},process.env.SECRET_TOKEN_CODE!,{expiresIn:"30d"})
+const generateToken= function(id:string){
+    console.log(process.env.SECRET_TOKEN_CODE)
+    return  jwt.sign({id},process.env.JWT_SECRET_CODE!,{expiresIn:"30d"})
 } 
 //Register User
 //POST/api/auth/register
@@ -17,11 +18,13 @@ const registerUser=async(req:Request,res:Response):Promise<void>=>{
         if(userExists){
             res.status(400).json({message:"user already exists"})
         }
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
         
         const user=await User.create({
             name,
             email,
-            password
+            password:hashedPassword
         })
         const createdUser=await User.findOne({email}).select("-password")
         if(!createdUser){
@@ -49,11 +52,12 @@ const registerUser=async(req:Request,res:Response):Promise<void>=>{
  const loginUser=async function(req:Request,res:Response):Promise<void>{
     try{
         const {email,password}=req.body
-        const userExists=await User.findOne({email})
-    
-        if(userExists && (await bcrypt.compare(password,userExists.password)) ){
+        const user=await User.findOne({email})
+        const passwordCompare=(await bcrypt.compare(password,user!.password))
+        console.log("************",email,password,passwordCompare,user)
+        if(user && passwordCompare){
 
-            res.status(200).json({message:"user already exists"})
+            res.status(200).json({_id: user._id, name: user.name, email: user.email, token: generateToken(user._id.toString()) })
         }else{
             res.status(400).json({message:"Invalid email or password"})
         }

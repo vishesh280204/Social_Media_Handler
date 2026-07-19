@@ -156,9 +156,6 @@ export const getGenerations=async(req:AuthRequest,res:Response):Promise<void>=>{
 export const getPosts=async(req:AuthRequest,res:Response):Promise<void>=>{
     try {
         const posts = await Post.find({user:req.user._id})
-        if(posts.length<1){
-            res.status(404).json({message:"No posts found for the user "})  
-        }
         res.status(200).json(posts)
     } catch (error:any) {
         res.status(500).json({message:`Server error getting posts  ${error.message}`})  
