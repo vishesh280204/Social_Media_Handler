@@ -142,9 +142,7 @@ export const generatePost=async(req:AuthRequest,res:Response):Promise<void>=>{
 export const getGenerations=async(req:AuthRequest,res:Response):Promise<void>=>{
     try {
         const generations= await Generation.find({user:req.user._id}).sort({createdAt :-1})
-        if(generations.length<1){
-            res.status(404).json({message:"No generation found for the user "})  
-        }
+        
         res.status(200).json(generations)
     } catch (error:any) {
         res.status(500).json({message:`Server error getting generations  ${error.message}`})  
@@ -165,46 +163,78 @@ export const getPosts=async(req:AuthRequest,res:Response):Promise<void>=>{
 
 //POST /api/posts  
 // It means to create and schedule a post 
-export const schedulePost=async(req:AuthRequest,res:Response):Promise<void>=>{
-
+export const schedulePost = async (req: AuthRequest, res: Response): Promise<void> => {
+    console.log("************","req.file:", req.file);
+    console.log("req.body:", req.body);
     try {
-        const {content,platforms,scheduledFor,status}=req.body
-        let parsedPlatforms=platforms
-        if(typeof platforms==="string"){
+        const { content, platforms, scheduledFor, status } = req.body;
+
+        // Parse platforms if it comes as a stringified array from FormData
+        let parsedPlatforms = platforms;
+        if(typeof platforms === "string"){
             try {
-                parsedPlatforms=JSON.parse(platforms)
-            } catch (error:any) {
-                parsedPlatforms=platforms.split(',')
+                parsedPlatforms = JSON.parse(platforms)
+            } catch (e) {
+                parsedPlatforms = platforms.split(",");
             }
         }
 
-        let mediaUrl:string | undefined=req.body.mediaUrl; 
-        let mediaType: "image" | "video" | undefined =req.body.mediaType
+        let mediaUrl: string | undefined = req.body.mediaUrl;
+        let mediaType: "image" | "video" | undefined = req.body.mediaType;
 
+        if (req.file) {
+        console.log("Starting Cloudinary upload...");
 
-        if(req.file){
-            const result = await new Promise<any>((resolve,reject)=>{
+        try {
+            const uploadResult = await new Promise<any>((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
                     {
-                    resource_type:"auto",
-                    folder:"social-scheduler",
+                        folder: "social-scheduler",
+                        resource_type: "auto",
+                        transformation: [
+                            {
+                                width: 1080,
+                                height: 1350,
+                                crop: "fill",
+                                gravity: "auto"
+                            }
+                        ]
                     },
-                    (error,result)=>{
-                        if(error) reject(error);
-                        else resolve(result)
+                    (error, result) => {
+                        if (error) {
+                            console.log("Cloudinary callback error:");
+                            console.dir(error, { depth: null });
+                            return reject(error);
+                        }
+
+                        console.log("Cloudinary callback success");
+                        resolve(result);
                     }
-                    
-                )
+                );
+
                 stream.end(req.file!.buffer);
-            })
-            mediaUrl=result.secure_url
-            mediaType=result.resource_type === "video"? "video":"image"
+            });
+
+            console.log("Upload Result:");
+            console.dir(uploadResult, { depth: null });
+
+            mediaUrl = uploadResult.secure_url;
+            mediaType =
+                uploadResult.resource_type === "video"
+                    ? "video"
+                    : "image";
+
+        } catch (error) {
+            console.log("Upload failed:");
+            console.dir(error, { depth: null });
         }
-
-                    
-
-        
-        const post = await Post.create({
+    }
+        console.log("**************************",
+    mediaUrl,
+    mediaType,
+    parsedPlatforms
+);
+         const post = await Post.create({
             user: req.user._id,
             content,
             ...(mediaUrl && { mediaUrl }),
@@ -213,11 +243,10 @@ export const schedulePost=async(req:AuthRequest,res:Response):Promise<void>=>{
             scheduledFor,
             status
         }); 
-        
-      res.status(200).json(post)
-    } catch (error:any) {
-        res.status(500).json({message:`Server error while scheduling post  ${error.message}`})  
+        res.status(201).json(post)
+
+    } catch (error: any) {
+        res.status(500).json({ message: error?.message || "Server error" });
     }
 }
-
 

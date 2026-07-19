@@ -37,11 +37,55 @@ const Scheduler = () => {
   }
   const handleSchedule= async (e:React.FormEvent)=>{
     e.preventDefault()
+    if(selectedPlatforms.length==0){
+      toast.error("Select atleast one platform to post")
+      return
+    }
+    if(!content){
+      toast.error("Add content for the post")
+      return
+    }
+    if(!scheduledDate || !scheduledTime){
+      toast.error("Select schedule date and time")
+      return
+    }
+     if(selectedPlatforms.includes('instagram') && !mediaFile){
+      toast.error("Instagram requires an image or video");
+      return;
+    }
+
+    const scheduledFor= new Date(`${scheduledDate}T${scheduledTime}`).toISOString()
+    const formData= new FormData()
+    formData.append('content',content)
+    formData.append('scheduledFor',scheduledFor)
+    formData.append("platforms", JSON.stringify(selectedPlatforms));
+    formData.append("status", "scheduled");
+    if(mediaFile) formData.append("media",mediaFile)
+    
     setLoading(true)
-    setTimeout(()=>{
+    try {
+      const {data}= await api.post('/api/posts',formData,
+        {headers:{
+          "Content-Type":"multipart/form-data"
+        }}
+      )
+      toast.success("Post scheduled!");
+      console.log(data)
+      setContent("")
+      setScheduledDate("")
+      setScheduledTime("")
+      setSelectedPlatforms([]);
+      setMediaFile(null);
+      fetchPosts();
+  
+    } catch (error:any) {
+      console.log(error,error?.message,"Error scheduling the post")
+    }finally{
       setLoading(false)
-      setPosts((prev)=>[...prev,dummyPostsData[0]])
-    },1000)
+    }
+
+    
+    
   }
   return (
      <div className="max-w-[1400px] mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-start overflow-hidden">
@@ -58,7 +102,8 @@ const Scheduler = () => {
                   </label>
 
                   <div className="flex flex-wrap gap-3">
-                    {PLATFORMS.map((p) => {
+                    {PLATFORMS
+                    .map((p) => {
                       const active = selectedPlatforms.includes(p.id);
 
                       return (

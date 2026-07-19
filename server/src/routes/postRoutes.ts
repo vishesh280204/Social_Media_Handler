@@ -6,7 +6,7 @@ import { upload } from "../config/multer.js";
 
 export const postRouter=Router()
 
-postRouter.post(  '/generate',protectAuthMiddleware,generatePost)
+postRouter.post('/generate',protectAuthMiddleware,generatePost)
 postRouter.get('/generations',protectAuthMiddleware,getGenerations)
 postRouter.get('/',protectAuthMiddleware,getPosts)
-postRouter.post('/',upload.single("media"),schedulePost)    
+postRouter.post('/',protectAuthMiddleware,upload.single("media"),schedulePost)    

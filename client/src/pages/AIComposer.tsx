@@ -1,6 +1,8 @@
 import { ArrowRightIcon, CalendarIcon, ClockIcon, HistoryIcon, Loader2Icon, LoaderIcon, TimerIcon, Wand2Icon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react"
 import { dummyGenerationData, PLATFORMS } from "../assets/assets";
+import api from "../api/axios";
+import toast from "react-hot-toast";
 
 const AIComposer = () => {
   const [prompt, setPrompt] = useState("");
@@ -19,7 +21,14 @@ const AIComposer = () => {
   const tones= ["Professional","Creative","Funny","Minimalist","Excited"]
 
   const fetchGenerations=async()=>{
-    setGenerations(dummyGenerationData) 
+    try {
+      const {data}=await api.get('/api/posts/generations')
+      console.log(data)
+
+      setGenerations(data)
+    } catch (error:any) {
+      toast.error( error?.response?.data?.message || error?.message)
+    } 
   }
   useEffect(()=>{
     fetchGenerations()
@@ -27,18 +36,70 @@ const AIComposer = () => {
 
 
   async function handleGenerate(){
-    setLoading(true)
-    setTimeout(()=>{
+    if(!prompt){
+      toast.error("Please enter the prompt")
+      return;
+    }
+    const payload={
+        prompt,
+        tone,
+        generateImage,
+
+      }
+      setLoading(true)
+    try {
+      
+      const {data}=await api.post('/api/posts/generate',payload)
+      console.log((data))
+      
+      setGenerations([data,...generations])
+      setActiveScheduler(data)
+      toast.success("Content generated successfully")
+    } catch (error:any) {
+      toast.error(error?.response?.data?.message || error?.message)
+    }finally{
       setLoading(false)
-    },2000)
+    }
   }
 
   const handleSchedule= async ()=>{
+    if(!activeScheduler)return;
+    if(selectedPlatforms.length===0){
+      toast.error("Select atleast one platform")
+      return;
+    }
+    if(!scheduledDate || !scheduledTime ){
+      toast.error("Select date and time for scheduling post")
+      return;
+    }
+    const scheduledFor=new Date(`${scheduledDate}T${scheduledTime}`).toISOString()
     setScheduling(true)
-    setTimeout(()=>{
+    console.log(scheduledFor)
+    try{
+        const {data}= await api.post('/api/posts/',
+          {
+            platforms:selectedPlatforms,
+            content:activeScheduler.content,
+            scheduledFor,
+            mediaUrl:activeScheduler.mediaUrl,
+            mediaType:activeScheduler.mediaType,
+            status:"scheduled"  
+          }
+        )
+        setActiveScheduler(null)
+        setSelectedPlatforms([])
+        setScheduledDate("")
+        setScheduledTime("") 
+
+    }catch(error:any){
+      toast.error(error?.response?.data?.message || error?.message)
+    }finally{
       setScheduling(false)
-    },2000)
+    }
   }
+  useEffect(() => {
+    console.log("generations", generations);
+  }, [generations]);
   return (
     
     <div className="max-w-4xl mx-auto space-y-12 pb-20 animate-in fade-in duration-700">
@@ -111,6 +172,7 @@ const AIComposer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           
           {
+            
             generations.map((gen)=>{
               return (
                 <div key={gen._id} className="group bg-white rounded-2xl border border-slate-100 p-5 hover:border-red-200 transition-all relative overflow-hidden">
@@ -121,7 +183,7 @@ const AIComposer = () => {
 
                       <span className="text-xs text-slate-400 uppercase tracking-widest">{new Date(gen.createdAt).toLocaleDateString()}</span>
 
-                      <span className="text-xs text-red-500 bg-red-50 px-2 py-0.5 rounded-md">{tone}
+                      <span className="text-xs text-red-500 bg-red-50 px-2 py-0.5 rounded-md">{gen.tone}
                       </span>  
 
                     </div>
