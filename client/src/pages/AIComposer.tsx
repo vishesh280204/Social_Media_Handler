@@ -1,6 +1,6 @@
 import { ArrowRightIcon, CalendarIcon, ClockIcon, HistoryIcon, Loader2Icon, LoaderIcon, TimerIcon, Wand2Icon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react"
-import { dummyGenerationData, PLATFORMS } from "../assets/assets";
+import {  PLATFORMS } from "../assets/assets";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 

@@ -2,7 +2,7 @@
 import { MenuIcon } from 'lucide-react'
 import Sidebar from './Sidebar'
 import { useState } from 'react'
-import React from 'react'
+
 
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuthContext } from '../context/authContext'
