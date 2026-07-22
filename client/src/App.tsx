@@ -7,13 +7,17 @@ import Accounts from "./pages/Accounts";
 import AIComposer from "./pages/AIComposer";
 import Scheduler from "./pages/Scheduler";
 import { Toaster } from "react-hot-toast";
+import ProtectRouteForLogin from "./components/ProtectRouteForLogin";
+
 export default function App() {
     return (
         <>
             <Toaster position="top-right"/> 
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
+                <Route element={<ProtectRouteForLogin/>}>
+                    <Route path="/login" element={<Login />} />
+                </Route>
                 <Route element={<Layout/>}>
                     <Route path="/dashboard" element={<Dashboard/>}/>
                     <Route path="/accounts" element={<Accounts/>}/>
